@@ -210,3 +210,90 @@ function sbp_get_available_slots() {
 }
 add_action('wp_ajax_sbp_get_available_slots', 'sbp_get_available_slots');
 add_action('wp_ajax_nopriv_sbp_get_available_slots', 'sbp_get_available_slots');
+
+
+
+
+
+// Add admin menu
+function sbp_admin_menu() {
+    add_menu_page('Staff Booking', 'Staff Booking', 'manage_options', 'staff-booking', 'sbp_admin_page', 'dashicons-calendar', 26);
+    add_submenu_page('staff-booking', 'Manage Staff', 'Manage Staff', 'manage_options', 'manage-staff', 'sbp_manage_staff_page');
+    add_submenu_page('staff-booking', 'Manage Services', 'Manage Services', 'manage_options', 'manage-services', 'sbp_manage_services_page');
+}
+add_action('admin_menu', 'sbp_admin_menu');
+
+// Admin pages
+function sbp_admin_page() {
+    echo '<h1>Staff Booking Dashboard</h1>';
+    // Display summary or other relevant info
+}
+
+function sbp_manage_staff_page() {
+    global $wpdb;
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sbp_add_staff'])) {
+        $staff_name = sanitize_text_field($_POST['staff_name']);
+        $wpdb->insert("{$wpdb->prefix}sbp_staff", ['name' => $staff_name]);
+    }
+    ?>
+    <h1>Manage Staff</h1>
+    <form method="post">
+        <label for="staff_name">Staff Name:</label>
+        <input type="text" id="staff_name" name="staff_name" required>
+        <button type="submit" name="sbp_add_staff">Add Staff</button>
+    </form>
+    <h2>Staff Members</h2>
+    <ul>
+        <?php
+        $staff = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}sbp_staff");
+        foreach ($staff as $member) {
+            echo "<li>{$member->name}</li>";
+        }
+        ?>
+    </ul>
+    <?php
+}
+
+function sbp_manage_services_page() {
+    global $wpdb;
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sbp_add_service'])) {
+        $staff_id = sanitize_text_field($_POST['staff_id']);
+        $service_name = sanitize_text_field($_POST['service_name']);
+        $wpdb->insert("{$wpdb->prefix}sbp_services", ['staff_id' => $staff_id, 'service_name' => $service_name]);
+    }
+    ?>
+    <h1>Manage Services</h1>
+    <form method="post">
+        <label for="staff_id">Staff Member:</label>
+        <select id="staff_id" name="staff_id" required>
+            <option value="">Select Staff Member</option>
+            <?php
+            $staff = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}sbp_staff");
+            foreach ($staff as $member) {
+                echo "<option value='{$member->id}'>{$member->name}</option>";
+            }
+            ?>
+        </select>
+        <label for="service_name">Service Name:</label>
+        <input type="text" id="service_name" name="service_name" required>
+        <button type="submit" name="sbp_add_service">Add Service</button>
+    </form>
+    <h2>Services</h2>
+    <ul>
+        <?php
+        $services = $wpdb->get_results("SELECT s.*, t.name AS staff_name FROM {$wpdb->prefix}sbp_services s JOIN {$wpdb->prefix}sbp_staff t ON s.staff_id = t.id");
+        foreach ($services as $service) {
+            echo "<li>{$service->staff_name} - {$service->service_name}</li>";
+        }
+        ?>
+    </ul>
+    <?php
+}
+
+
+
+
+
+
+
+
