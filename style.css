@@ -1,0 +1,45 @@
+ .sbp-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+#booking-form {
+    display: flex;
+    flex-direction: column;
+}
+
+#booking-form label {
+    margin-top: 10px;
+}
+
+#booking-form input, #booking-form select, #booking-form button {
+    margin-top: 5px;
+}
+
+#time-slots-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.sbp-time-slot {
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    text-align: center;
+}
+
+.sbp-time-slot.selected {
+    background-color: #0073aa;
+    color: #fff;
+    border-color: #0073aa;
+}
+
+.success {
+    color: green;
+}
+
+.error {
+    color: red;
+}
